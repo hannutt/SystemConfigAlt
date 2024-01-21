@@ -1,0 +1,296 @@
+<SystemConfig>:
+MDScreen:
+    MDBottomNavigation:
+        MDBottomNavigationItem:
+            id:'screen1'
+            name:'screen1'
+            text:'Front page'
+            #checkbox ennen spinneriä koska muuten spinnerin arvon valitessa checkboxi tulee myös valituksi
+            MDCheckbox:
+                id:autoupdate
+                pos:50,80
+                on_active:app.checkboxState(*args)
+            Spinner:
+                id:selection
+                size_hint: None, None
+                size: 100, 44
+                #pos_hint: {'center_x':0.1,'center_y':0.2}
+                pos:350,20
+                text: 'Home'
+                values: 'Memory & disk', 'OS', 'Battery', 'Network','Start screen'
+                on_text: if selection.text=='Memory & disk': app.memoryStats()
+                on_text: if selection.text=='Start screen':app.on_start()
+                on_text: if selection.text=='OS':app.osStats()
+                on_text: if selection.text=='Battery':app.batteryStats()
+                on_text: if selection.text=='Network':app.networkStats()
+            
+            MDRoundFlatButton:
+                id:closeBtn
+                text:"Close process"
+                pos:350,80
+                on_press:app.ShowCloseTasks()
+            
+                
+            MDLabel:
+                id:time
+                text:
+                pos:350,-100
+            MDCheckbox:
+                id:stopCB
+                opacity:0
+                disabled:True
+                size_hint:.5,.5
+                pos:375,-65
+                on_active:app.setStop(*args)
+            MDLabel:
+
+                #id:llä yksilöidään komponentit
+
+                id:title
+                text:'System Config'
+                font_name:"Comic"
+                font_size:20
+                color:(0,0,1,1)
+              
+                
+
+
+                #tekstin asemointi x/y akselilla
+
+                pos_hint:{'center_x':0.9, 'center_y':0.9}
+            MDLabel:
+                id:autoupdateLbl
+                text:"Autoupdate"
+                pos:320,89
+            
+            MDLabel:
+                id:reboot
+                text:
+                pos:300,170
+            
+            MDLabel:
+                id:location
+                text:
+                pos:300,145
+               
+                
+                
+            MDLabel:
+
+                #id:llä yksilöidään komponentit
+
+                id:infolbl
+                text:
+                pos:270,60
+            
+            MDProgressBar:
+                id:bar
+                #progressbarin leveys on 50% ohjelmaikkunan leveydestä ja korkeus 1% ikkunasta
+                size_hint:.5,0.01
+                #height:dp(15)
+                #width:"15dp"
+                opacity:0
+                pos:230,150 
+                value:
+               
+            
+             
+         
+
+                #tekstin asemointi x/y akselilla
+            MDLabel:
+                canvas.before:
+                    Color:
+                        rgb: .8, .8, .8
+                    Rectangle:
+                        pos:200,130
+                        size:350,250
+                id:info
+                width:20
+                height:30
+                
+                font_name:"Comic"
+                font_size:18
+                markup:True
+                text:
+                pos:270,8
+              
+            
+            Image:
+                id:FrontImg
+                source:
+                size_hint_x:0.3
+                
+            Switch:
+                id:switch
+                pos:-260,135
+                active:
+                size_hint:.8,.8
+                on_active:app.DrawBars(self,self.active)
+        
+            MDRoundFlatButton:
+                id:moreInfoBtn
+                text:"More information?"
+                pos_hint:{'center_x':0.8}
+                opacity:0
+                #taustaväri ja tekstin väri
+                md_bg_color:"lightblue"
+                text_color:"black"
+                on_press:app.osSpesificStats()
+
+               
+                
+
+                #tekstin asemointi x/y akselilla
+
+                
+       
+
+        MDBottomNavigationItem:
+            id:graphics
+            name:'screen2'
+         
+            text:'Graphics'
+            disabled:False
+            backround_color:230,5,5
+            Image:
+                id:img
+                source:
+            MDLabel:
+                id:pieCBLbl
+                text: "Draw memory values as %"
+                pos:230,0
+            
+            MDCheckbox:
+                id:pieCBper
+               
+                #size hint propertyn avulla checkboxit saadaan yksilöityä siten, että yhtä cb:tä klikatessa ohjelma
+                #ei aktivoi kaikki checkboxeja oletusarvo on koko ruudun kokoinen cb.
+                size_hint:.5,.5
+                pos:235,125
+                on_active:app.DrawPiePercent(*args)
+            MDLabel:
+                id:pieLblVal
+                text: "Draw memory values as numbers"
+                pos:230,25
+            MDCheckbox:
+                
+                id:pieCBval
+            
+                pos:35,24
+                on_active:app.DrawPieValues(*args)
+            MDRoundFlatButton:
+                id:backBtn
+                text:"Go back"
+                opacity:0
+                on_press:app.ClearDrawnings()
+        MDBottomNavigationItem:
+            id:running
+            name:'running'
+            backround_color:230,5,5
+            #funktion suoritus kun näkymä avataan
+            on_enter:app.showPath(explorer.path)
+            text:'Explore'
+            disabled:False
+
+            FileChooserListView:
+                #taustavärin määrityd FileChooserListView:lle
+                canvas.before:
+                    Color:
+                        rgb: .5, .5, .5
+                    Rectangle:
+                        pos:self.pos
+                        size:self.size
+                id:explorer
+                size:
+                path:
+                dirselect:True
+                #valittu tiedosto lähetetään funktiokutsun parametrina
+                on_selection:app.selected(explorer.selection)
+                on_selection:app.PathNameOnly(explorer.path)
+            
+
+            MDLabel:
+                id:runLbl
+                text: "Run Application?"
+                pos:280,34
+            MDCheckbox:
+                id:runApp
+                size_hint:.5,.5
+                pos:280,200
+                on_active:app.changeOpacity(*args)          
+            
+            
+            MDRoundFlatButton:
+                id:runBtn
+                text:"Run"
+                opacity:0
+                pos:120,200
+                on_press:app.RunApplication()
+            
+            MDLabel:
+                id:listplace
+                text:
+                pos_hint:{'center_x':0.5, 'center_y':0.6}
+                
+            MDTextField:
+                id:name
+                hint_text:"Enter app name"
+                mode:"rectangle"
+                pos_hint:{'center_x':0.5, 'center_y':0.5}
+                #pos:230,25
+                width:25
+            MDLabel:
+                id:status
+                text:
+                pos_hint:{'center_x':0.5, 'center_y':0.4}
+                
+            MDRoundFlatButton:
+                id:checkBtn
+                text:"Check"
+                pos:40,200
+                on_press:app.checkRunningApp()
+            MDRaisedButton:
+                id:FcBackBtn
+                md_bg_color:"black"
+                text_color:"white"
+                text:"<--"
+                pos:40,60
+                on_press:app.FcGoBack(explorer.path)
+            MDRaisedButton:
+                id:statBtn
+                md_bg_color:"black"
+                text_color:"white"
+                text:"File spesifics"
+                pos:180,60
+                on_press:app.fileStatsPopup()
+            MDRaisedButton:
+                id:FindBtn
+                md_bg_color:"black"
+                text_color:"white"
+                text:"Find file"
+                pos:300,60
+                on_press:app.findFile(explorer.path)
+            MDLabel:
+                id:fileFound
+                opacity:0
+                text:
+                pos:300,65
+                mb_bg_color:"green"
+            
+
+           
+           
+            
+
+           
+            
+          
+      
+          
+               
+          
+
+            
+
+       
