@@ -24,6 +24,7 @@ MDScreen:
                 on_text: if selection.text=='Battery':app.batteryStats()
                 on_text: if selection.text=='Network':app.networkStats()
             
+            
             MDRoundFlatButton:
                 id:closeBtn
                 text:"Close process"
@@ -34,7 +35,7 @@ MDScreen:
             MDLabel:
                 id:time
                 text:
-                pos:350,-100
+                pos:500,-100
             MDCheckbox:
                 id:stopCB
                 opacity:0
@@ -130,7 +131,7 @@ MDScreen:
         
             MDRoundFlatButton:
                 id:moreInfoBtn
-                text:"More information?"
+                text:"Show more"
                 pos_hint:{'center_x':0.8}
                 opacity:0
                 #taustaväri ja tekstin väri

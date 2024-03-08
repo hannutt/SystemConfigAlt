@@ -1,9 +1,18 @@
-UNDER CONSTRUCTION.
-A Cross-platform application made with Python Kivy.
-you can collect information about your device. such as the amount of memory and disk space and create graphs of them. the program also shows the running applications and they can also be closed using the program.
+System data collector app.
+Project keywords: Python,Kivy,Cross-platform, KV-language,Matplotlib
+The program collects and displays system information about your device.
 
-The program can also show the operating system and network information, such as whether your internet connection is on or off.
+MAIN FEATURES:
 
-the program also has an explorer clone implemented with Kivy file chooser
+CURRENTLY RUNNING APPLICATIONS
 
-New features are under development.
+See currently running applications. This is done with the Pywinauto Desktop library.
+Applications are displayed in a simple list
+
+CLOSE RUNNING APPLICATION
+
+You can close a running application with a mouse click. Every running application has a PID (Process ID),
+which is needed to close the application. Process-id is obtained using the Psutil library.
+
+GRAPHIC DIAGRAMS OF SYSTEM DATA
+You can make graphs of free and used memory, disk space, etc. This feature is made with the Matplotlib library.

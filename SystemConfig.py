@@ -2,6 +2,7 @@ import time
 from datetime import datetime
 import platform
 import shutil
+import speedtest
 import kivy
 from kivy.lang import Builder
 from kivymd.app import MDApp
@@ -37,6 +38,8 @@ import urllib.request
 import subprocess
 from subprocess import check_output
 import re
+import socket
+
 kivy.require('2.2.1')
 
 
@@ -199,8 +202,9 @@ class SystemConfig(MDApp):
       #if ehdossa, jos istopped on true, sekuntien lasku pysähtyy
      def setStop(self,checkbox,cbval):
         if cbval:
-           self.isStopped = True
-           print(self.isStopped)
+            Clock.schedule_interval(lambda sec:self.secondCount(),1)
+            Clock.schedule_once(lambda dt:self.on_start(),6)
+      
         
 
      def changeOpacity(self,cb,cbvalue):
@@ -293,6 +297,7 @@ class SystemConfig(MDApp):
       #ensimäinen if lohko ja kahdella jaollinen näyttää alemman if lohkon
       if self.clicks % 1 == 0:
          self.root.ids.info.text=''
+         self.root.ids.moreInfoBtn.text='Show less'
          '''
          for i in range(4):
             unameList.append(platform.uname()[i])
@@ -302,6 +307,7 @@ class SystemConfig(MDApp):
          unameReplaced = unameReplaced.replace("uname_result","").replace("(","").replace(")","")
          self.root.ids.info.text=str(earlierInfo)+"\n"+str(platform.platform())+"\n"+ str(unameReplaced)
       if self.clicks % 2 == 0:
+         self.root.ids.moreInfoBtn.text='Show more'
          self.osStats()
 
          #self.root.ids.info.text=''
@@ -348,12 +354,15 @@ class SystemConfig(MDApp):
       #lambda viittauksella voidaan antaa on_start metodille parametrina 5 sekuntia ilman, että metodille
       #täytyy erikseen määritellä parametrimuuttuja
       
-      Clock.schedule_interval(lambda sec:self.secondCount(),1)
+      '''
       if self.isStopped == False:
+         Clock.schedule_interval(lambda sec:self.secondCount(),1)
          Clock.schedule_once(lambda dt:self.on_start(),6)
-      if self.isStopped == True:
-         Clock.schedule_once(lambda dt:self.memoryStats(),6)
+      elif self.isStopped == True:
+         Clock.unschedule(lambda sec:self.secondCount(),1)
+         Clock.unschedule(lambda dt:self.on_start(),6)
       print(self.isStopped)
+      '''
       #return lauseella voidaan käyttää allmem muuttujaan tallennettuja arvoja toisessa funktiossa, ilman
       #että niitä tarvitsee määritellä uudelleen toisessa metodissa.
       return self.allMem
@@ -369,9 +378,15 @@ class SystemConfig(MDApp):
                return False
            
      def networkStats(self):
+        
+        st=speedtest.Speedtest()
+        down = st.download()/(1024*1024)
+        down = round(down,2)
+        hostname = socket.gethostname()
+        IPAddr = socket.gethostbyname(hostname)
         self.root.ids.info.text=''
         if self.checkConnection():
-           self.root.ids.info.text="Your are online"
+           self.root.ids.info.text="Your are online\n ip address: "+str(IPAddr)+"\n"+"Download speed: "+str(down)
         else:
            self.root.ids.info.text="You are offline"
    
@@ -467,7 +482,7 @@ class SystemConfig(MDApp):
         
         popup = Popup(title="Close tasks: ",content=box)
         box.add_widget(Label(text='Name  Process id'))
-       
+        
         
         #muistin käyttö ja käynnistyajat tallennetaan listoihin.
         timeValues = []
@@ -490,6 +505,7 @@ class SystemConfig(MDApp):
             mem = p.memory_percent()
             mem = round(mem,2)
             memoryValues.append(mem)
+            
 
    
            
@@ -498,27 +514,30 @@ class SystemConfig(MDApp):
          box.add_widget(Button(markup=True, text="Starting time: "+str(timeValues[self.i]) +" Memory usage: " +str(memoryValues[self.i])+" % [b]"+str(self.apps[self.i]),on_press=self.closeTask))
         box.add_widget(confLbl)
         box.add_widget(confCB)
-       
+        
            
         popup.open()
+        #popup ikkuna nousee aloitusikkunan päälle, joten takaisin menoon riittää pelkkä popup.dismiss
+        GoBackBtn=(Button(text='Go back',color='lightblue',on_press=popup.dismiss))
+        box.add_widget(GoBackBtn)
         
-
 
           
      def createConfirmWind(self):
-        boxLayout = BoxLayout(orientation="horizontal")
-        confirmPop = Popup(title='Confirm close',content=boxLayout)
-        yesBtn = Button(text="yes",size=(50,25))
-        noBtn = Button(text="No",size=(50,25))
+           
+           boxLayout = BoxLayout(orientation="horizontal")
+           confirmPop = Popup(title='Confirm close',content=boxLayout)
+           yesBtn = Button(text="yes",size=(50,25))
+           noBtn = Button(text="No",size=(50,25))
         
         
-        boxLayout.add_widget(yesBtn)
-        boxLayout.add_widget(noBtn)
-        noBtn.bind(on_press=confirmPop.dismiss)
-        yesBtn.bind(on_press=self.DoClose)
+           boxLayout.add_widget(yesBtn)
+           boxLayout.add_widget(noBtn)
+           noBtn.bind(on_press=confirmPop.dismiss)
+           yesBtn.bind(on_press=self.DoClose)
 
         
-        confirmPop.open()
+           confirmPop.open()
 
       
      def closeTask(self,instance):
@@ -527,12 +546,14 @@ class SystemConfig(MDApp):
       #print(name)
       #instancen avulla saatiin ratkaistua aiempi ongelma, jossa parametrin saanut metodi palauttaa arvon
       #antamalla instance parametriksi return arvon palautus ja uudelleenkäyttö toimii
-      if self.confirm(instance):
+      if self.confirmed==True:
          self.createConfirmWind()
+      '''
       if not self.confirm(instance):
 
-         self.DoClose()
+         self.DoClose(instance)
       return self.Fname
+      '''
      
      
 
@@ -551,6 +572,9 @@ class SystemConfig(MDApp):
   
         
      def confirm(self,cbval):
+        self.confirmed=True
+        print(self.confirmed)
+        '''
         self.confirmClicks = self.confirmClicks+1
         if self.confirmClicks % 1 == 0:
 
@@ -560,6 +584,7 @@ class SystemConfig(MDApp):
            self.confirmed=False
            print(self.confirmed)
          #return self.confirmed
+      '''
        
       
         
@@ -590,6 +615,7 @@ class SystemConfig(MDApp):
         self.seconds = self.seconds -1
         lblText =  "Seconds until get back to start screen: "
         
+        
       
 
         #pysäytetään return komennolla laskeminen jos seconds on pienempi kuin 0
@@ -597,7 +623,7 @@ class SystemConfig(MDApp):
            return
         elif self.isStopped == True:
            self.root.ids.time.text="stopped"
-           return
+           
         else:
          self.root.ids.time.text=" "
 
@@ -627,10 +653,10 @@ class SystemConfig(MDApp):
         #value on cb:n tila, jos se on valittu kutsutaan systemruntime2 metodia 5 sekunnin välein.
         if value:
            print("checkbox clicked")
-           Clock.schedule_interval(self.systemRunTime2,5)
+           Clock.schedule_interval(self.systemRunTime,5)
         elif value != True:
            #pysäytetään ajastettu metodin kutsu
-           Clock.unschedule(self.systemRunTime2)
+           Clock.unschedule(self.systemRunTime)
 
       
      def DrawPieValues(self,checkbox,cbval):
