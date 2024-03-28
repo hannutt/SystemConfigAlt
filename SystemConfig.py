@@ -349,7 +349,7 @@ class SystemConfig(MDApp):
       #self.root.ids.info.color=(0,1,0,1)
       #self.root.ids.info.text="\n Total Disk space: "+str(self.totalSize)+"\n Used disk space: "+str(self.usedSize)+"\n Free disk space "+str(self.freeSize)
     
-      self.allMem = (self.free,self.used)
+      self.allMem = (self.free,self.used,self.usedSize,self.freeSize)
 
       #lambda viittauksella voidaan antaa on_start metodille parametrina 5 sekuntia ilman, että metodille
       #täytyy erikseen määritellä parametrimuuttuja
@@ -389,7 +389,7 @@ class SystemConfig(MDApp):
            self.root.ids.info.text="Your are online\n ip address: "+str(IPAddr)+"\n"+"Download speed: "+str(down)
         else:
            self.root.ids.info.text="You are offline"
-   
+    
      #sijainnin haku laitteen lat/long koordinaattien perusteella
      def getLocation(self):
        #jos metodin return arvo on true eli internet on yhdistetty
@@ -407,7 +407,7 @@ class SystemConfig(MDApp):
      #käynnissä olevien sovellusten haku on_start metodi suoritetaan heti ohjelman käynnistyttyä.
      def on_start(self):
        
-       self.getLocation()
+       #self.getLocation()
        
        #listan tyhjennys, ilman clearia listan sisältö tulostuu toisen kerran edellisen listan perään
        #jos valitsee ensin esim memory&disk vaihtoehdon ja sen jälkeen start screen vaihtoehdon
@@ -659,39 +659,36 @@ class SystemConfig(MDApp):
            Clock.unschedule(self.systemRunTime)
 
       
-     def DrawPieValues(self,checkbox,cbval):
+     def DrawPieValues(self):
         memorylabels = []
-        
-        if cbval:
-           self.root.ids.backBtn.opacity=1
-           self.values = self.memoryStats()
-           memoryValues = [self.values[0],self.values[1]]
-           memorylblFree = "Free: "+str(self.values[0]) + " GB"
-           memorylabels.append(memorylblFree)
-           memorylblUsed = "Used: "+str(self.values[1])+ " GB"
-           memorylabels.append(memorylblUsed)
-           fig,ax = plt.subplots()
-           ax.pie(memoryValues,labels=memorylabels,colors=["green","red"])
+        self.root.ids.graphicTitle.opacity=0
+        self.root.ids.backBtn.opacity=1
+        self.values = self.memoryStats()
+        memoryValues = [self.values[0],self.values[1]]
+        memorylblFree = "Free: "+str(self.values[0]) + " GB"
+        memorylabels.append(memorylblFree)
+        memorylblUsed = "Used: "+str(self.values[1])+ " GB"
+        memorylabels.append(memorylblUsed)
+        fig,ax = plt.subplots()
+        ax.pie(memoryValues,labels=memorylabels,colors=["green","red"])
            #plt.pie(memoryValues,labels=memorylabels,colors=["green","red"])
-           fig.savefig("memoryNumbers2.png")
-           self.root.ids.img.source="memoryNumbers2.png"
+        fig.savefig("memoryNumbers2.png")
+        #näytetään kaavio img id:llä nimetyssä kuva-oliossa
+        self.root.ids.img.source="memoryNumbers2.png"
 
-     def DrawPiePercent(self,checkbox,cbvalue):
-        if cbvalue:
-         self.root.ids.backBtn.opacity=1
-         #checkboksin piilotus
-         self.root.ids.pieCBper.opacity=0
-           # haetaan ja tallennetaan muuttujaan memorystats metodin return arvo
-         self.values = self.memoryStats()
-      
-        
-         memoryValues = [self.values[0],self.values[1]]
-         memorylabels = ['Free','Used']
-         plt.pie(memoryValues,labels=memorylabels,autopct='%1.2f%%',colors=["green","red"])
-       
-         plt.savefig("memory.png")
-        #näytetään kuva img-id:llä varustetussa Image-objektissa (ks.kvfile)
-         self.root.ids.img.source="memory.png"
+     def DrawDiskSpace(self):
+        self.diskValues = self.memoryStats()
+
+        #tässä haetaan memorystats metodin palauttamista arvoist lista 3 ja 4 alkio
+        #ylemmässä metodissa haetaan saman listan 1 ja 2 alkio
+        finalvalue = [self.diskValues[2],self.diskValues[3]]
+        fig,ax = plt.subplots()
+        ax.pie(finalvalue,colors=["green","red"])
+           #plt.pie(memoryValues,labels=memorylabels,colors=["green","red"])
+        fig.savefig("diskspace.png")
+        #näytetään kaavio img id:llä nimetyssä kuva-oliossa
+        self.root.ids.img.source="diskspace.png"
+        print(finalvalue)
 
      def ClearDrawnings(self):
         self.root.ids.img.source="" 

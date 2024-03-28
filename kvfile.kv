@@ -158,28 +158,20 @@ MDScreen:
                 id:img
                 source:
             MDLabel:
-                id:pieCBLbl
-                text: "Draw memory values as %"
-                pos:230,0
-            
-            MDCheckbox:
-                id:pieCBper
-               
-                #size hint propertyn avulla checkboxit saadaan yksilöityä siten, että yhtä cb:tä klikatessa ohjelma
-                #ei aktivoi kaikki checkboxeja oletusarvo on koko ruudun kokoinen cb.
-                size_hint:.5,.5
-                pos:235,125
-                on_active:app.DrawPiePercent(*args)
-            MDLabel:
-                id:pieLblVal
-                text: "Draw memory values as numbers"
-                pos:230,25
-            MDCheckbox:
-                
-                id:pieCBval
-            
-                pos:35,24
-                on_active:app.DrawPieValues(*args)
+                id:graphicTitle
+                text:'Graphics'
+                font_size:22
+                pos:250,58
+            Spinner:
+                id:Graphselection
+                size_hint: None, None
+                size: 100, 44
+                #pos_hint: {'center_x':0.1,'center_y':0.2}
+                pos:350,20
+                text: 'Home'
+                values: 'Free/used RAM','Free/used disk space'
+                on_text: if Graphselection.text=='Free/used RAM':app.DrawPieValues()
+                on_text: if Graphselection.text=='Free/used disk space':app.DrawDiskSpace()
             MDRoundFlatButton:
                 id:backBtn
                 text:"Go back"
